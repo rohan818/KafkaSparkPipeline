@@ -23,3 +23,19 @@ traffic_data = spark.readStream.format("kafka") \
     .load()
 
 # Parse JSON data
+traffic_df = traffic_data.selectExpr("CAST(value AS STRING)") \
+    .select(from_json(col("value"), schema).alias("data")) \
+    .select("data.*")
+
+# Process data, here calculating avg. speed per sensor
+processed_Data = traffic_df.groupBy("sensor_id") \
+    .avg("average_speed") \
+    .alias("average_speed")
+
+# output to console
+query = processed_data.writeStream \
+    .outputMode("complete") \
+    .format("console") \
+    .start()
+
+query.awaitTermination()
