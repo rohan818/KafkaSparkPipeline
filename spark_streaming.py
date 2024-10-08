@@ -33,10 +33,30 @@ processed_data = traffic_df.groupBy("sensor_id") \
     .avg("average_speed") \
     .alias("average_speed")
 
-# output to console
+# Function to write to PostgreSQL
+def write_to_postgres(df, epoch_id):
+    df.write \
+    .format("jdbc")
+    .option("url", "jdbc:postgresql://localhost:5432/traffic_data") \
+    .option("dbtable", "traffic_summary") \
+    .option("user", ""),
+    .option("password", "")
+    .option("driver", "org.postgresql.Driver") \
+    .mode("append") \
+    .save()
+
+# Output to PostgreSQL
+query = processed_data.writeStream \
+    .foreachBatch(write_to_postgres) \
+    .outputMode("update") \
+    .start()
+
+'''
+# Output to console
 query = processed_data.writeStream \
     .outputMode("complete") \
     .format("console") \
     .start()
+'''
 
 query.awaitTermination()
