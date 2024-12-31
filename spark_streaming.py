@@ -36,11 +36,11 @@ processed_data = traffic_df.groupBy("sensor_id") \
 # Function to write to PostgreSQL
 def write_to_postgres(df, epoch_id):
     df.write \
-    .format("jdbc")
+    .format("jdbc") \
     .option("url", "jdbc:postgresql://localhost:5432/traffic_data") \
     .option("dbtable", "traffic_summary") \
-    .option("user", ""),
-    .option("password", "")
+    .option("user", "") \
+    .option("password", "") \
     .option("driver", "org.postgresql.Driver") \
     .mode("append") \
     .save()
